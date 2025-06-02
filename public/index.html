@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZooCollab - Platformă de colaborare pentru cercetători în zoologie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>ZooCollab</h1>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#" class="active">Acasă</a></li>
+                    <li><a href="#" id="projects-link">Proiecte</a></li>
+                    <li><a href="#" id="login-link">Autentificare</a></li>
+                    <li><a href="#" id="register-link">Înregistrare</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home-section" class="section-visible">
+            <h2>Bine ați venit pe ZooCollab</h2>
+            <p class="lead">Platforma de colaborare pentru cercetători în domeniul zoologiei</p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Colaborare</h3>
+                    <p>Lucrați împreună cu alți cercetători pe proiecte de zoologie</p>
+                </div>
+                <div class="feature">
+                    <h3>Colectare de date</h3>
+                    <p>Înregistrați observații din teren și partajați-le cu echipa</p>
+                </div>
+                <div class="feature">
+                    <h3>Analiză</h3>
+                    <p>Analizați datele colectate pentru a obține rezultate relevante</p>
+                </div>
+            </div>
+            <div class="cta">
+                <button id="get-started-btn" class="btn btn-primary">Începeți acum</button>
+            </div>
+        </section>
+
+        <section id="login-section" class="section-hidden">
+            <h2>Autentificare</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Parolă</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Autentificare</button>
+            </form>
+            <p>Nu aveți cont? <a href="#" id="to-register-link">Înregistrați-vă</a></p>
+        </section>
+
+        <section id="register-section" class="section-hidden">
+            <h2>Înregistrare</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Nume complet</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Parolă</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-institution">Instituție</label>
+                    <input type="text" id="register-institution" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-specialization">Specializare</label>
+                    <input type="text" id="register-specialization">
+                </div>
+                <button type="submit" class="btn btn-primary">Înregistrare</button>
+            </form>
+            <p>Aveți deja cont? <a href="#" id="to-login-link">Autentificați-vă</a></p>
+        </section>
+
+        <section id="projects-section" class="section-hidden">
+            <div class="section-header">
+                <h2>Proiecte de cercetare</h2>
+                <button id="add-project-btn" class="btn btn-sm">Adaugă proiect</button>
+            </div>
+            <div id="projects-list" class="projects-container">
+                <!-- Proiectele vor fi adăugate dinamic aici -->
+                <p id="no-projects-message">Nu există proiecte disponibile. Creați un proiect nou!</p>
+            </div>
+        </section>
+
+        <section id="project-form-section" class="section-hidden">
+            <h2>Adaugă proiect nou</h2>
+            <form id="project-form">
+                <div class="form-group">
+                    <label for="project-title">Titlu</label>
+                    <input type="text" id="project-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Descriere</label>
+                    <textarea id="project-description" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-start-date">Data de început</label>
+                    <input type="date" id="project-start-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-end-date">Data de sfârșit (opțional)</label>
+                    <input type="date" id="project-end-date">
+                </div>
+                <div class="form-group">
+                    <label for="project-status">Status</label>
+                    <select id="project-status" required>
+                        <option value="planificat">Planificat</option>
+                        <option value="activ">Activ</option>
+                        <option value="finalizat">Finalizat</option>
+                        <option value="suspendat">Suspendat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="project-species">Specii țintă (separate prin virgulă)</label>
+                    <input type="text" id="project-species">
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-project-btn" class="btn btn-secondary">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează proiect</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="project-details-section" class="section-hidden">
+            <div class="section-header">
+                <button id="back-to-projects-btn" class="btn btn-sm">Înapoi la proiecte</button>
+            </div>
+            <div id="project-details"></div>
+            <div class="section-header">
+                <h3>Observații</h3>
+                <button id="add-observation-btn" class="btn btn-sm">Adaugă observație</button>
+            </div>
+            <div id="project-observations" class="observations-container">
+                <!-- Observațiile vor fi adăugate dinamic aici -->
+                <p id="no-observations-message">Nu există observații pentru acest proiect.</p>
+            </div>
+        </section>
+
+        <section id="observation-form-section" class="section-hidden">
+            <h2>Adaugă observație nouă</h2>
+            <form id="observation-form">
+                <div class="form-group">
+                    <label for="observation-species-scientific">Numele științific al speciei</label>
+                    <input type="text" id="observation-species-scientific" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-species-common">Numele comun al speciei</label>
+                    <input type="text" id="observation-species-common">
+                </div>
+                <div class="form-group">
+                    <label for="observation-latitude">Latitudine</label>
+                    <input type="number" id="observation-latitude" step="any" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-longitude">Longitudine</label>
+                    <input type="number" id="observation-longitude" step="any" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-date">Data observației</label>
+                    <input type="date" id="observation-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-count">Număr de exemplare</label>
+                    <input type="number" id="observation-count" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-notes">Note</label>
+                    <textarea id="observation-notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-observation-btn" class="btn btn-secondary">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează observație</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ZooCollab. Toate drepturile rezervate.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="notification-message"></p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

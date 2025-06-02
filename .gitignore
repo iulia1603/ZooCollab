@@ -1,0 +1,25 @@
+# Dependențe
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Fișiere de mediu
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Fișiere de log
+logs
+*.log
+
+# Fișiere de sistem
+.DS_Store
+Thumbs.db
+
+# Editoare de cod
+.idea/
+.vscode/
+*.swp
+*.swo
