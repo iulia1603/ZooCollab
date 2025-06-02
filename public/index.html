@@ -12,16 +12,19 @@
             <h1>ZooCollab</h1>
             <nav id="main-nav">
                 <ul>
-                    <li><a href="#" class="active">Acasă</a></li>
-                    <li><a href="#" id="projects-link">Proiecte</a></li>
-                    <li><a href="#" id="login-link">Autentificare</a></li>
-                    <li><a href="#" id="register-link">Înregistrare</a></li>
+                    <li><a href="#" class="nav-link active" data-section="home">Acasă</a></li>
+                    <li><a href="#" class="nav-link" id="projects-link" data-section="projects">Proiecte</a></li>
+                    <li><a href="#" class="nav-link" id="public-projects-link" data-section="publicProjects">Proiecte Publice</a></li>
+                    <li><a href="#" class="nav-link" id="profile-link" data-section="profile">Profil</a></li>
+                    <li><a href="#" class="nav-link" id="login-link" data-section="login">Autentificare</a></li>
+                    <li><a href="#" class="nav-link" id="register-link" data-section="register">Înregistrare</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="container">
+        <!-- Secțiunea principală -->
         <section id="home-section" class="section-visible">
             <h2>Bine ați venit pe ZooCollab</h2>
             <p class="lead">Platforma de colaborare pentru cercetători în domeniul zoologiei</p>
@@ -44,6 +47,58 @@
             </div>
         </section>
 
+        <!-- Secțiunea de profil -->
+        <section id="profile-section" class="section-hidden">
+            <h2>Profilul meu</h2>
+            <div id="profile-content">
+                <div id="profile-not-authenticated" class="profile-message">
+                    <p>Pentru a vizualiza profilul, vă rugăm să vă autentificați.</p>
+                    <button class="btn btn-primary" onclick="showSection('login')">Autentificare</button>
+                </div>
+                <div id="profile-authenticated" class="profile-details" style="display: none;">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <h3 id="profile-name">Nume utilizator</h3>
+                            <span id="profile-role" class="role-badge">Rol</span>
+                        </div>
+                        <div class="profile-info">
+                            <div class="info-group">
+                                <label>Email:</label>
+                                <span id="profile-email">email@example.com</span>
+                            </div>
+                            <div class="info-group">
+                                <label>Instituție:</label>
+                                <span id="profile-institution">Nume instituție</span>
+                            </div>
+                            <div class="info-group">
+                                <label>Specializare:</label>
+                                <span id="profile-specialization">Specializare</span>
+                            </div>
+                            <div class="info-group">
+                                <label>Membru din:</label>
+                                <span id="profile-member-since">Data înregistrării</span>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-card">
+                                <h4 id="profile-projects-count">0</h4>
+                                <p>Proiecte</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4 id="profile-observations-count">0</h4>
+                                <p>Observații</p>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn btn-secondary" id="edit-profile-btn">Editează profil</button>
+                            <button class="btn btn-danger" id="logout-btn">Deconectare</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Secțiunea de autentificare -->
         <section id="login-section" class="section-hidden">
             <h2>Autentificare</h2>
             <form id="login-form">
@@ -60,6 +115,7 @@
             <p>Nu aveți cont? <a href="#" id="to-register-link">Înregistrați-vă</a></p>
         </section>
 
+        <!-- Secțiunea de înregistrare -->
         <section id="register-section" class="section-hidden">
             <h2>Înregistrare</h2>
             <form id="register-form">
@@ -88,17 +144,29 @@
             <p>Aveți deja cont? <a href="#" id="to-login-link">Autentificați-vă</a></p>
         </section>
 
+        <!-- Secțiunea proiecte publice -->
+        <section id="public-projects-section" class="section-hidden">
+            <div class="section-header">
+                <h2>Proiecte publice</h2>
+                <p class="section-description">Explorați proiectele de cercetare publice ale comunității</p>
+            </div>
+            <div id="public-projects-list" class="projects-container">
+                <p id="no-public-projects-message">Nu există proiecte publice disponibile.</p>
+            </div>
+        </section>
+
+        <!-- Secțiunea proiecte (pentru utilizatori autentificați) -->
         <section id="projects-section" class="section-hidden">
             <div class="section-header">
-                <h2>Proiecte de cercetare</h2>
+                <h2>Proiectele mele</h2>
                 <button id="add-project-btn" class="btn btn-sm">Adaugă proiect</button>
             </div>
             <div id="projects-list" class="projects-container">
-                <!-- Proiectele vor fi adăugate dinamic aici -->
                 <p id="no-projects-message">Nu există proiecte disponibile. Creați un proiect nou!</p>
             </div>
         </section>
 
+        <!-- Formularul pentru proiecte -->
         <section id="project-form-section" class="section-hidden">
             <h2>Adaugă proiect nou</h2>
             <form id="project-form">
@@ -131,6 +199,14 @@
                     <label for="project-species">Specii țintă (separate prin virgulă)</label>
                     <input type="text" id="project-species">
                 </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="project-is-public">
+                        <span class="checkmark"></span>
+                        Proiect public (poate fi vizualizat de toți utilizatorii)
+                    </label>
+                    <small class="form-help">Proiectele private pot fi văzute doar de creator și membri</small>
+                </div>
                 <div class="form-actions">
                     <button type="button" id="cancel-project-btn" class="btn btn-secondary">Anulează</button>
                     <button type="submit" class="btn btn-primary">Salvează proiect</button>
@@ -138,6 +214,7 @@
             </form>
         </section>
 
+        <!-- Secțiunea detalii proiect -->
         <section id="project-details-section" class="section-hidden">
             <div class="section-header">
                 <button id="back-to-projects-btn" class="btn btn-sm">Înapoi la proiecte</button>
@@ -148,11 +225,11 @@
                 <button id="add-observation-btn" class="btn btn-sm">Adaugă observație</button>
             </div>
             <div id="project-observations" class="observations-container">
-                <!-- Observațiile vor fi adăugate dinamic aici -->
                 <p id="no-observations-message">Nu există observații pentru acest proiect.</p>
             </div>
         </section>
 
+        <!-- Formularul pentru observații -->
         <section id="observation-form-section" class="section-hidden">
             <h2>Adaugă observație nouă</h2>
             <form id="observation-form">

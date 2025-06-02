@@ -21,6 +21,10 @@ const ProjectSchema = new mongoose.Schema({
     enum: ['planificat', 'activ', 'finalizat', 'suspendat'],
     default: 'planificat'
   },
+  isPublic: {
+    type: Boolean,
+    default: false // Proiectele sunt private by default
+  },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -33,7 +37,8 @@ const ProjectSchema = new mongoose.Schema({
     },
     role: {
       type: String,
-      default: 'membru'
+      enum: ['co-investigator', 'research-assistant', 'asistent-cercetare', 'observer'],
+      default: 'observer'
     },
     joinedDate: {
       type: Date,
@@ -49,5 +54,10 @@ const ProjectSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+// Index pentru căutări eficiente
+ProjectSchema.index({ isPublic: 1 });
+ProjectSchema.index({ creator: 1 });
+ProjectSchema.index({ 'members.user': 1 });
 
 module.exports = mongoose.model('Project', ProjectSchema);

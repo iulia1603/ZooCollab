@@ -4,6 +4,7 @@ const state = {
   token: null,
   user: null,
   projects: [],
+  publicProjects: [],
   currentProject: null,
   currentSection: 'home-section'
 };
@@ -14,16 +15,20 @@ const selectors = {
     home: document.getElementById('home-section'),
     login: document.getElementById('login-section'),
     register: document.getElementById('register-section'),
+    profile: document.getElementById('profile-section'),
     projects: document.getElementById('projects-section'),
+    publicProjects: document.getElementById('public-projects-section'),
     projectForm: document.getElementById('project-form-section'),
     projectDetails: document.getElementById('project-details-section'),
     observationForm: document.getElementById('observation-form-section')
   },
   nav: {
-    home: document.querySelector('nav a.active'),
-    projects: document.getElementById('projects-link'),
+    links: document.querySelectorAll('.nav-link'),
+    profile: document.getElementById('profile-link'),
     login: document.getElementById('login-link'),
-    register: document.getElementById('register-link')
+    register: document.getElementById('register-link'),
+    projects: document.getElementById('projects-link'),
+    publicProjects: document.getElementById('public-projects-link')
   },
   forms: {
     login: document.getElementById('login-form'),
@@ -37,15 +42,18 @@ const selectors = {
     cancelProject: document.getElementById('cancel-project-btn'),
     backToProjects: document.getElementById('back-to-projects-btn'),
     addObservation: document.getElementById('add-observation-btn'),
-    cancelObservation: document.getElementById('cancel-observation-btn')
+    cancelObservation: document.getElementById('cancel-observation-btn'),
+    logout: document.getElementById('logout-btn')
   },
   containers: {
     projectsList: document.getElementById('projects-list'),
+    publicProjectsList: document.getElementById('public-projects-list'),
     projectDetails: document.getElementById('project-details'),
     projectObservations: document.getElementById('project-observations')
   },
   messages: {
     noProjects: document.getElementById('no-projects-message'),
+    noPublicProjects: document.getElementById('no-public-projects-message'),
     noObservations: document.getElementById('no-observations-message')
   },
   modal: {
@@ -56,6 +64,18 @@ const selectors = {
   links: {
     toRegister: document.getElementById('to-register-link'),
     toLogin: document.getElementById('to-login-link')
+  },
+  profile: {
+    notAuthenticated: document.getElementById('profile-not-authenticated'),
+    authenticated: document.getElementById('profile-authenticated'),
+    name: document.getElementById('profile-name'),
+    email: document.getElementById('profile-email'),
+    institution: document.getElementById('profile-institution'),
+    specialization: document.getElementById('profile-specialization'),
+    memberSince: document.getElementById('profile-member-since'),
+    role: document.getElementById('profile-role'),
+    projectsCount: document.getElementById('profile-projects-count'),
+    observationsCount: document.getElementById('profile-observations-count')
   }
 };
 
@@ -115,7 +135,11 @@ const api = {
   
   // Proiecte
   async getProjects() {
-    return this.request('/projects');
+    return this.request('/projects/my');
+  },
+  
+  async getPublicProjects() {
+    return this.request('/projects/public');
   },
   
   async createProject(projectData) {
@@ -171,6 +195,15 @@ const api = {
     return this.request(`/projects/${projectId}/members/${userId}/role`, 'PUT', {
       role
     });
+  },
+
+  // Profile
+  async getProfileStats() {
+    return this.request('/profile/stats');
+  },
+
+  async getProfileActivity() {
+    return this.request('/profile/activity');
   }
 };
 
@@ -178,18 +211,28 @@ const api = {
 function showSection(sectionId) {
   console.log(`🖥️ Switching to section: ${sectionId}`);
   
+  // Actualizează navigarea
+  selectors.nav.links.forEach(link => {
+    link.classList.remove('active');
+    if (link.dataset.section === sectionId) {
+      link.classList.add('active');
+    }
+  });
+  
   // Ascunde toate secțiunile
   Object.values(selectors.sections).forEach(section => {
-    section.classList.add('section-hidden');
-    section.classList.remove('section-visible');
+    if (section) {
+      section.classList.add('section-hidden');
+      section.classList.remove('section-visible');
+    }
   });
   
   // Afișează secțiunea selectată
-  const section = selectors.sections[sectionId];
-  if (section) {
-    section.classList.remove('section-hidden');
-    section.classList.add('section-visible');
-    state.currentSection = section.id;
+  const sectionElement = document.getElementById(`${sectionId}-section`);
+  if (sectionElement) {
+    sectionElement.classList.remove('section-hidden');
+    sectionElement.classList.add('section-visible');
+    state.currentSection = sectionElement.id;
   }
 }
 
@@ -201,44 +244,103 @@ function showNotification(message) {
 
 function updateNavigation() {
   if (state.isAuthenticated) {
-    selectors.nav.login.textContent = 'Profil';
+    selectors.nav.profile.style.display = 'block';
+    selectors.nav.projects.style.display = 'block';
+    selectors.nav.login.style.display = 'none';
     selectors.nav.register.textContent = 'Deconectare';
   } else {
+    selectors.nav.profile.style.display = 'none';
+    selectors.nav.projects.style.display = 'none';
+    selectors.nav.login.style.display = 'block';
     selectors.nav.login.textContent = 'Autentificare';
     selectors.nav.register.textContent = 'Înregistrare';
   }
 }
 
+function updateProfile() {
+  if (state.isAuthenticated && state.user) {
+    selectors.profile.notAuthenticated.style.display = 'none';
+    selectors.profile.authenticated.style.display = 'block';
+    
+    selectors.profile.name.textContent = state.user.name;
+    selectors.profile.email.textContent = state.user.email;
+    selectors.profile.institution.textContent = state.user.institution;
+    selectors.profile.specialization.textContent = state.user.specialization || 'Nu este specificată';
+    selectors.profile.memberSince.textContent = new Date(state.user.createdAt).toLocaleDateString('ro-RO');
+    
+    // Actualizează badge-ul de rol
+    selectors.profile.role.textContent = state.user.role;
+    selectors.profile.role.className = `role-badge ${state.user.role}`;
+    
+    // Încarcă statisticile profilului
+    loadProfileStats();
+    
+  } else {
+    selectors.profile.notAuthenticated.style.display = 'block';
+    selectors.profile.authenticated.style.display = 'none';
+  }
+}
+
+async function loadProfileStats() {
+  try {
+    const stats = await api.getProfileStats();
+    console.log('Profile stats loaded:', stats);
+    
+    // Actualizează statisticile
+    selectors.profile.projectsCount.textContent = stats.totalProjects;
+    selectors.profile.observationsCount.textContent = stats.totalObservations;
+    
+  } catch (error) {
+    console.error('Error loading profile stats:', error);
+    // Fallback la statistici din state
+    selectors.profile.projectsCount.textContent = state.projects.length;
+    selectors.profile.observationsCount.textContent = '0';
+  }
+}
+
 // Funcții pentru gestionarea proiectelor
-function renderProjects() {
-  console.log(`🏗️ Rendering ${state.projects.length} projects`);
+function renderProjects(projects = state.projects, containerId = 'projects-list', noProjectsMessageId = 'no-projects-message') {
+  console.log(`🏗️ Rendering ${projects.length} projects in ${containerId}`);
   
-  const container = selectors.containers.projectsList;
-  const noProjectsMessage = selectors.messages.noProjects;
+  const container = document.getElementById(containerId);
+  const noProjectsMessage = document.getElementById(noProjectsMessageId);
+  
+  if (!container) return;
   
   // Curăță containerul
   container.innerHTML = '';
   
-  if (state.projects.length === 0) {
-    noProjectsMessage.style.display = 'block';
+  if (projects.length === 0) {
+    if (noProjectsMessage) noProjectsMessage.style.display = 'block';
     return;
   }
   
-  noProjectsMessage.style.display = 'none';
+  if (noProjectsMessage) noProjectsMessage.style.display = 'none';
   
   // Randează fiecare proiect
-  state.projects.forEach(project => {
+  projects.forEach(project => {
     console.log(`📋 Rendering project: ${project.title} (ID: ${project._id})`);
     
     const projectCard = document.createElement('div');
-    projectCard.className = 'project-card';
+    projectCard.className = `project-card ${project.isPublic ? 'public' : 'private'}`;
     
     const statusClass = `status-${project.status}`;
+    const visibilityClass = project.isPublic ? 'visibility-public' : 'visibility-private';
+    const visibilityText = project.isPublic ? 'Public' : 'Privat';
     
     projectCard.innerHTML = `
-      <h3>${project.title}</h3>
-      <span class="status ${statusClass}">${project.status}</span>
-      <p>${project.description.substring(0, 100)}${project.description.length > 100 ? '...' : ''}</p>
+      <div class="project-header">
+        <h3 class="project-title">${project.title}</h3>
+        <div class="project-badges">
+          <span class="status ${statusClass}">${project.status}</span>
+          <span class="project-visibility ${visibilityClass}">${visibilityText}</span>
+        </div>
+      </div>
+      <p>${project.description.substring(0, 150)}${project.description.length > 150 ? '...' : ''}</p>
+      <div class="project-info">
+        <small><strong>Creator:</strong> ${project.creator.name}</small>
+        <small><strong>Membri:</strong> ${project.members.length + 1}</small>
+      </div>
       <div class="project-actions">
         <button class="btn btn-sm view-project" data-id="${project._id}">Vizualizare</button>
       </div>
@@ -256,32 +358,27 @@ function renderProjects() {
 
 async function viewProject(projectId) {
   console.log(`👀 Attempting to view project: ${projectId}`);
-  console.log(`👤 Current user:`, state.user);
   
   try {
     console.log(`🔍 Fetching project details...`);
     state.currentProject = await api.getProject(projectId);
     
     console.log(`✅ Project fetched successfully:`, state.currentProject);
-    console.log(`🔑 User role check:`, {
-      isCreator: state.user && state.currentProject.creator._id === state.user._id,
-      userId: state.user?._id,
-      creatorId: state.currentProject.creator._id,
-      members: state.currentProject.members.map(m => ({
-        userId: m.user._id,
-        userName: m.user.name,
-        role: m.role
-      }))
-    });
     
     renderProjectDetails();
     
-    // Obține observațiile pentru acest proiect
-    console.log(`📊 Fetching observations for project...`);
-    const observations = await api.getProjectObservations(projectId);
-    console.log(`📊 Observations fetched:`, observations);
-    
-    renderProjectObservations(observations);
+    // Obține observațiile pentru acest proiect doar dacă utilizatorul poate adăuga observații
+    if (state.currentProject.accessInfo?.canAddObservations) {
+      console.log(`📊 Fetching observations for project...`);
+      const observations = await api.getProjectObservations(projectId);
+      console.log(`📊 Observations fetched:`, observations);
+      
+      renderProjectObservations(observations);
+    } else {
+      // Pentru proiecte publice fără acces de membru, afișează un mesaj
+      const observationsContainer = selectors.containers.projectObservations;
+      observationsContainer.innerHTML = '<p class="access-restricted">Observațiile sunt disponibile doar pentru membrii proiectului.</p>';
+    }
     
     showSection('projectDetails');
   } catch (error) {
@@ -303,12 +400,27 @@ function renderProjectDetails() {
   const startDate = new Date(project.startDate).toLocaleDateString('ro-RO');
   const endDate = project.endDate ? new Date(project.endDate).toLocaleDateString('ro-RO') : 'Nedefinit';
   
-  // Verifică dacă utilizatorul curent este creatorul
-  const isCreator = state.user && project.creator._id === state.user._id;
-  console.log(`👑 Is creator check:`, { isCreator, userId: state.user?._id, creatorId: project.creator._id });
+  // Verifică tipul de acces
+  const accessInfo = project.accessInfo || {};
+  const canEdit = accessInfo.canEdit || false;
+  const canManageMembers = accessInfo.canManageMembers || false;
+  const canAddObservations = accessInfo.canAddObservations || false;
+  
+  const visibilityBadge = project.isPublic ? 
+    '<span class="project-visibility visibility-public">Public</span>' : 
+    '<span class="project-visibility visibility-private">Privat</span>';
+  
+  let accessBadge = '';
+  if (accessInfo.accessType === 'public') {
+    accessBadge = '<span class="access-info access-public">Vizualizare publică</span>';
+  } else if (accessInfo.accessType === 'creator') {
+    accessBadge = '<span class="access-info access-creator">Creator</span>';
+  } else if (accessInfo.accessType === 'member') {
+    accessBadge = '<span class="access-info access-member">Membru</span>';
+  }
   
   container.innerHTML = `
-    <h2>${project.title}</h2>
+    <h2>${project.title} ${visibilityBadge} ${accessBadge}</h2>
     <div class="metadata">
       <div>
         <strong>Status:</strong> 
@@ -333,7 +445,7 @@ function renderProjectDetails() {
     <div class="members">
       <div class="members-header">
         <h3>Membri echipei (${project.members.length + 1})</h3>
-        ${isCreator ? '<button id="add-member-btn" class="btn btn-sm">Adaugă membru</button>' : ''}
+        ${canManageMembers ? '<button id="add-member-btn" class="btn btn-sm">Adaugă membru</button>' : ''}
       </div>
       
       <ul class="members-list">
@@ -351,7 +463,7 @@ function renderProjectDetails() {
               <span class="member-role">${member.role}</span>
               <small>${member.user.institution}</small>
             </div>
-            ${isCreator ? `
+            ${canManageMembers ? `
               <div class="member-actions">
                 <button class="btn btn-sm btn-secondary edit-member-role" data-user-id="${member.user._id}" data-current-role="${member.role}">
                   Editează rol
@@ -365,7 +477,7 @@ function renderProjectDetails() {
         `).join('')}
       </ul>
       
-      ${isCreator ? `
+      ${canManageMembers ? `
         <div id="add-member-form" class="add-member-form" style="display: none;">
           <h4>Adaugă membru nou</h4>
           <div class="form-group">
@@ -398,8 +510,14 @@ function renderProjectDetails() {
     </div>
   `;
   
+  // Actualizează vizibilitatea butonului de adăugare observații
+  const addObservationBtn = selectors.buttons.addObservation;
+  if (addObservationBtn) {
+    addObservationBtn.style.display = canAddObservations ? 'inline-block' : 'none';
+  }
+  
   // Adaugă event listeners pentru gestionarea membrilor
-  if (isCreator) {
+  if (canManageMembers) {
     setupMemberManagementListeners();
   }
 }
@@ -735,39 +853,44 @@ async function deleteObservationConfirmed(observationId) {
 function setupEventListeners() {
   console.log(`🎧 Setting up event listeners`);
   
-  // Navigare
-  selectors.nav.home.addEventListener('click', (e) => {
-    e.preventDefault();
-    showSection('home');
-  });
-  
-  selectors.nav.projects.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (!state.isAuthenticated) {
-      showSection('login');
-      return;
-    }
-    loadProjects();
-  });
-  
-  selectors.nav.login.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (state.isAuthenticated) {
-      // Pagină profil sau deconectare
-      showSection('profile');
-    } else {
-      showSection('login');
-    }
-  });
-  
-  selectors.nav.register.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (state.isAuthenticated) {
-      // Deconectare
-      logout();
-    } else {
-      showSection('register');
-    }
+  // Navigare principală
+  selectors.nav.links.forEach(link => {
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const section = link.dataset.section;
+      
+      // Gestionează secțiunile speciale
+      if (section === 'projects') {
+        if (!state.isAuthenticated) {
+          showSection('login');
+          return;
+        }
+        await loadProjects();
+      } else if (section === 'publicProjects') {
+        await loadPublicProjects();
+      } else if (section === 'profile') {
+        if (!state.isAuthenticated) {
+          showSection('login');
+          return;
+        }
+        updateProfile();
+        showSection('profile');
+      } else if (section === 'login') {
+        if (state.isAuthenticated) {
+          showSection('profile');
+        } else {
+          showSection('login');
+        }
+      } else if (section === 'register') {
+        if (state.isAuthenticated) {
+          logout();
+        } else {
+          showSection('register');
+        }
+      } else if (section) {
+        showSection(section);
+      }
+    });
   });
   
   // Formulare
@@ -791,7 +914,7 @@ function setupEventListeners() {
       await loadUserData();
       
       // Redirecționare către proiecte
-      loadProjects();
+      await loadProjects();
       
       // Resetează formularul
       selectors.forms.login.reset();
@@ -827,7 +950,7 @@ function setupEventListeners() {
       await loadUserData();
       
       // Redirecționare către proiecte
-      loadProjects();
+      await loadProjects();
       
       // Resetează formularul
       selectors.forms.register.reset();
@@ -847,6 +970,7 @@ function setupEventListeners() {
     const endDate = document.getElementById('project-end-date').value;
     const status = document.getElementById('project-status').value;
     const speciesInput = document.getElementById('project-species').value;
+    const isPublic = document.getElementById('project-is-public').checked;
     
     // Procesează speciile
     const targetSpecies = [];
@@ -874,7 +998,8 @@ function setupEventListeners() {
         description,
         startDate,
         status,
-        targetSpecies
+        targetSpecies,
+        isPublic
       };
       
       if (endDate) {
@@ -936,52 +1061,74 @@ function setupEventListeners() {
   });
   
   // Butoane
-  selectors.buttons.getStarted.addEventListener('click', () => {
-    if (state.isAuthenticated) {
-      loadProjects();
-    } else {
-      showSection('register');
-    }
-  });
+  if (selectors.buttons.getStarted) {
+    selectors.buttons.getStarted.addEventListener('click', () => {
+      if (state.isAuthenticated) {
+        loadProjects();
+      } else {
+        showSection('register');
+      }
+    });
+  }
   
-  selectors.buttons.addProject.addEventListener('click', () => {
-    showSection('projectForm');
-  });
+  if (selectors.buttons.addProject) {
+    selectors.buttons.addProject.addEventListener('click', () => {
+      showSection('projectForm');
+    });
+  }
   
-  selectors.buttons.cancelProject.addEventListener('click', () => {
-    selectors.forms.project.reset();
-    showSection('projects');
-  });
+  if (selectors.buttons.cancelProject) {
+    selectors.buttons.cancelProject.addEventListener('click', () => {
+      selectors.forms.project.reset();
+      showSection('projects');
+    });
+  }
   
-  selectors.buttons.backToProjects.addEventListener('click', () => {
-    state.currentProject = null;
-    showSection('projects');
-  });
+  if (selectors.buttons.backToProjects) {
+    selectors.buttons.backToProjects.addEventListener('click', () => {
+      state.currentProject = null;
+      showSection('projects');
+    });
+  }
   
-  selectors.buttons.addObservation.addEventListener('click', () => {
-    showSection('observationForm');
-  });
+  if (selectors.buttons.addObservation) {
+    selectors.buttons.addObservation.addEventListener('click', () => {
+      showSection('observationForm');
+    });
+  }
   
-  selectors.buttons.cancelObservation.addEventListener('click', () => {
-    selectors.forms.observation.reset();
-    showSection('projectDetails');
-  });
+  if (selectors.buttons.cancelObservation) {
+    selectors.buttons.cancelObservation.addEventListener('click', () => {
+      selectors.forms.observation.reset();
+      showSection('projectDetails');
+    });
+  }
+  
+  if (selectors.buttons.logout) {
+    selectors.buttons.logout.addEventListener('click', logout);
+  }
   
   // Link-uri
-  selectors.links.toRegister.addEventListener('click', (e) => {
-    e.preventDefault();
-    showSection('register');
-  });
+  if (selectors.links.toRegister) {
+    selectors.links.toRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection('register');
+    });
+  }
   
-  selectors.links.toLogin.addEventListener('click', (e) => {
-    e.preventDefault();
-    showSection('login');
-  });
+  if (selectors.links.toLogin) {
+    selectors.links.toLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      showSection('login');
+    });
+  }
   
   // Modal
-  selectors.modal.close.addEventListener('click', () => {
-    selectors.modal.notification.style.display = 'none';
-  });
+  if (selectors.modal.close) {
+    selectors.modal.close.addEventListener('click', () => {
+      selectors.modal.notification.style.display = 'none';
+    });
+  }
   
   window.addEventListener('click', (e) => {
     if (e.target === selectors.modal.notification) {
@@ -998,6 +1145,7 @@ async function loadUserData() {
     state.user = await api.getCurrentUser();
     console.log(`✅ User data loaded:`, state.user);
     updateNavigation();
+    updateProfile();
   } catch (error) {
     console.error('Load user data error:', error);
     logout();
@@ -1005,15 +1153,28 @@ async function loadUserData() {
 }
 
 async function loadProjects() {
-  console.log(`📋 Loading projects...`);
+  console.log(`📋 Loading user projects...`);
   
   try {
     state.projects = await api.getProjects();
     console.log(`✅ Projects loaded:`, state.projects);
-    renderProjects();
+    renderProjects(state.projects, 'projects-list', 'no-projects-message');
     showSection('projects');
   } catch (error) {
     console.error('Load projects error:', error);
+  }
+}
+
+async function loadPublicProjects() {
+  console.log(`🌍 Loading public projects...`);
+  
+  try {
+    state.publicProjects = await api.getPublicProjects();
+    console.log(`✅ Public projects loaded:`, state.publicProjects);
+    renderProjects(state.publicProjects, 'public-projects-list', 'no-public-projects-message');
+    showSection('publicProjects');
+  } catch (error) {
+    console.error('Load public projects error:', error);
   }
 }
 
@@ -1024,9 +1185,11 @@ function logout() {
   state.isAuthenticated = false;
   state.user = null;
   state.projects = [];
+  state.publicProjects = [];
   state.currentProject = null;
   
   updateNavigation();
+  updateProfile();
   showSection('home');
   showNotification('V-ați deconectat cu succes!');
 }
@@ -1041,6 +1204,11 @@ async function init() {
   state.isAuthenticated = false;
   state.token = null;
   updateNavigation();
+  updateProfile();
+  
+  // Încarcă proiectele publice pe pagina principală
+  await loadPublicProjects();
+  showSection('home');
   
   console.log(`✅ Application initialized`);
 }

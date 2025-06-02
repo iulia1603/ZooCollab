@@ -19,6 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/projects', require('./src/routes/projects'));
 app.use('/api/observations', require('./src/routes/observation'));
+app.use('/api/profile', require('./src/routes/profile'));
 
 // Rută pentru pagina principală
 app.get('*', (req, res) => {
@@ -27,4 +28,8 @@ app.get('*', (req, res) => {
 
 // Definire port și pornire server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server pornit pe portul ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server pornit pe portul ${PORT}`);
+  console.log(`📱 Aplicația este disponibilă la: http://localhost:${PORT}`);
+  console.log(`🗄️ Pentru a popula baza de date, rulează: npm run populate`);
+});
