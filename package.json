@@ -1,0 +1,52 @@
+{
+  "name": "zoocollab",
+  "version": "1.0.0",
+  "description": "Platformă de colaborare pentru cercetători în zoologie",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "populate": "node populate.js",
+    "reset-db": "node populate.js",
+    "health-check": "node health-check.js",
+    "setup": "npm install && node health-check.js",
+    "full-reset": "node populate.js && node health-check.js",
+    "test-connection": "node -e \"require('./health-check.js').runHealthCheck()\"",
+    "check-db": "node -e \"const mongoose = require('mongoose'); mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/zoocollab').then(() => {console.log('✅ MongoDB OK'); process.exit(0);}).catch(err => {console.error('❌ MongoDB Error:', err.message); process.exit(1);});\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "zoologie",
+    "cercetare",
+    "colaborare",
+    "știință",
+    "mongodb",
+    "express",
+    "nodejs"
+  ],
+  "author": "ZooCollab Team",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/zoocollab.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/zoocollab/issues"
+  },
+  "homepage": "https://github.com/your-username/zoocollab#readme"
+}

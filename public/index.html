@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZooCollab - Platformă de colaborare pentru cercetători în zoologie</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>ZooCollab</h1>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#" class="active">Acasă</a></li>
+                    <li><a href="#" id="projects-link">Proiecte</a></li>
+                    <li><a href="#" id="login-link">Autentificare</a></li>
+                    <li><a href="#" id="register-link">Înregistrare</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home-section" class="section-visible">
+            <h2>Bine ați venit pe ZooCollab</h2>
+            <p class="lead">Platforma de colaborare pentru cercetători în domeniul zoologiei</p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Colaborare</h3>
+                    <p>Lucrați împreună cu alți cercetători pe proiecte de zoologie</p>
+                </div>
+                <div class="feature">
+                    <h3>Colectare de date</h3>
+                    <p>Înregistrați observații din teren și partajați-le cu echipa</p>
+                </div>
+                <div class="feature">
+                    <h3>Analiză</h3>
+                    <p>Analizați datele colectate pentru a obține rezultate relevante</p>
+                </div>
+            </div>
+            <div class="cta">
+                <button id="get-started-btn" class="btn btn-primary">Începeți acum</button>
+            </div>
+            
+            <!-- Secțiune pentru proiecte publice (vizibile și pentru utilizatori neautentificați) -->
+            <div class="public-projects-preview">
+                <h3>Proiecte publice recente</h3>
+                <div id="public-projects-preview" class="projects-container">
+                    <!-- Proiectele publice vor fi încărcate aici -->
+                </div>
+                <div class="cta">
+                    <button id="view-all-public-btn" class="btn btn-secondary">Vezi toate proiectele publice</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="login-section" class="section-hidden">
+            <h2>Autentificare</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Parolă</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Autentificare</button>
+            </form>
+            <p>Nu aveți cont? <a href="#" id="to-register-link">Înregistrați-vă</a></p>
+        </section>
+
+        <section id="register-section" class="section-hidden">
+            <h2>Înregistrare</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Nume complet</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Parolă</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-institution">Instituție</label>
+                    <input type="text" id="register-institution" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-specialization">Specializare</label>
+                    <input type="text" id="register-specialization">
+                </div>
+                <button type="submit" class="btn btn-primary">Înregistrare</button>
+            </form>
+            <p>Aveți deja cont? <a href="#" id="to-login-link">Autentificați-vă</a></p>
+        </section>
+
+        <section id="projects-section" class="section-hidden">
+            <div class="section-header">
+                <h2>Proiecte de cercetare</h2>
+                <button id="add-project-btn" class="btn btn-sm">Adaugă proiect</button>
+            </div>
+
+            <!-- Adaugă această secțiune înainte de projects-list în index.html -->
+<div class="projects-filters">
+    <h3>Filtrează proiectele</h3>
+    <div class="filters-container">
+        <div class="filter-group">
+            <label for="search-projects">Căutare text</label>
+            <input type="text" id="search-projects" placeholder="Caută în titlu sau descriere...">
+        </div>
+        
+        <div class="filter-group">
+            <label for="filter-status">Status proiect</label>
+            <select id="filter-status">
+                <option value="">Toate</option>
+                <option value="planificat">Planificat</option>
+                <option value="activ">Activ</option>
+                <option value="finalizat">Finalizat</option>
+                <option value="suspendat">Suspendat</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filter-visibility">Vizibilitate</label>
+            <select id="filter-visibility">
+                <option value="">Toate</option>
+                <option value="public">Public</option>
+                <option value="private">Privat</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filter-creator">Creator</label>
+            <select id="filter-creator">
+                <option value="">Toți creatorii</option>
+                <option value="mine">Proiectele mele</option>
+                <!-- Opțiunile vor fi populate dinamic -->
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filter-species">Specii țintă</label>
+            <input type="text" id="filter-species" placeholder="Caută după specie...">
+        </div>
+        
+        <div class="filter-actions">
+            <button id="clear-filters" class="btn btn-secondary btn-sm">Resetează filtrele</button>
+            <button id="apply-filters" class="btn btn-primary btn-sm">Aplică filtrele</button>
+        </div>
+    </div>
+    
+    <div class="filter-results">
+        <span id="results-count">0 proiecte găsite</span>
+        <div class="sort-options">
+            <label for="sort-projects">Sortează după:</label>
+            <select id="sort-projects">
+                <option value="date-desc">Data creării (recent)</option>
+                <option value="date-asc">Data creării (vechi)</option>
+                <option value="title-asc">Titlu (A-Z)</option>
+                <option value="title-desc">Titlu (Z-A)</option>
+                <option value="status">Status</option>
+            </select>
+        </div>
+    </div>
+</div>
+            
+            <div id="projects-list" class="projects-container">
+                <!-- Proiectele vor fi adăugate dinamic aici -->
+                <p id="no-projects-message">Nu există proiecte disponibile. Creați un proiect nou!</p>
+            </div>
+        </section>
+
+        <section id="public-projects-section" class="section-hidden">
+            <div class="section-header">
+                <h2>Proiecte publice</h2>
+                <button id="back-to-home-btn" class="btn btn-sm">Înapoi la pagina principală</button>
+            </div>
+            <div id="public-projects-list" class="projects-container">
+                <!-- Proiectele publice vor fi adăugate dinamic aici -->
+                <p id="no-public-projects-message">Nu există proiecte publice disponibile.</p>
+            </div>
+        </section>
+
+        <section id="project-form-section" class="section-hidden">
+            <h2>Adaugă proiect nou</h2>
+            <form id="project-form">
+                <div class="form-group">
+                    <label for="project-title">Titlu</label>
+                    <input type="text" id="project-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-description">Descriere</label>
+                    <textarea id="project-description" rows="5" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="project-start-date">Data de început</label>
+                    <input type="date" id="project-start-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-end-date">Data de sfârșit (opțional)</label>
+                    <input type="date" id="project-end-date">
+                </div>
+                <div class="form-group">
+                    <label for="project-status">Status</label>
+                    <select id="project-status" required>
+                        <option value="planificat">Planificat</option>
+                        <option value="activ">Activ</option>
+                        <option value="finalizat">Finalizat</option>
+                        <option value="suspendat">Suspendat</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="project-visibility">Vizibilitate proiect</label>
+                    <select id="project-visibility" required>
+                        <option value="private">Privat (doar membrii pot vizualiza)</option>
+                        <option value="public">Public (toți utilizatorii pot vizualiza)</option>
+                    </select>
+                    <small class="form-help">
+                        Proiectele private pot fi vizualizate doar de către membri, 
+                        în timp ce proiectele publice sunt vizibile tuturor utilizatorilor ZooCollab.
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="project-species">Specii țintă (separate prin virgulă)</label>
+                    <input type="text" id="project-species">
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-project-btn" class="btn btn-secondary">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează proiect</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="project-details-section" class="section-hidden">
+            <div class="section-header">
+                <button id="back-to-projects-btn" class="btn btn-sm">Înapoi la proiecte</button>
+            </div>
+            <div id="project-details"></div>
+            <div class="section-header">
+                <h3>Observații</h3>
+                <button id="add-observation-btn" class="btn btn-sm">Adaugă observație</button>
+            </div>
+            <div id="project-observations" class="observations-container">
+                <!-- Observațiile vor fi adăugate dinamic aici -->
+                <p id="no-observations-message">Nu există observații pentru acest proiect.</p>
+            </div>
+        </section>
+
+        <section id="observation-form-section" class="section-hidden">
+            <h2>Adaugă observație nouă</h2>
+            <form id="observation-form">
+                <div class="form-group">
+                    <label for="observation-species-scientific">Numele științific al speciei</label>
+                    <input type="text" id="observation-species-scientific" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-species-common">Numele comun al speciei</label>
+                    <input type="text" id="observation-species-common">
+                </div>
+                <div class="form-group">
+                    <label for="observation-latitude">Latitudine</label>
+                    <input type="number" id="observation-latitude" step="any" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-longitude">Longitudine</label>
+                    <input type="number" id="observation-longitude" step="any" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-date">Data observației</label>
+                    <input type="date" id="observation-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-count">Număr de exemplare</label>
+                    <input type="number" id="observation-count" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="observation-notes">Note</label>
+                    <textarea id="observation-notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="cancel-observation-btn" class="btn btn-secondary">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează observație</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Adaugă această secțiune în index.html după secțiunea observation-form-section -->
+<section id="profile-section" class="section-hidden">
+    <div class="section-header">
+        <h2>Profilul meu</h2>
+        <button id="back-to-home-from-profile-btn" class="btn btn-sm">Înapoi la pagina principală</button>
+    </div>
+    
+    <!-- Informații utilizator -->
+    <div id="user-info" class="user-info-card">
+        <h3>Informații personale</h3>
+        <div class="user-details">
+            <!-- Vor fi completate dinamic -->
+        </div>
+    </div>
+    
+    <!-- Proiectele utilizatorului -->
+    <div class="user-projects">
+        <h3>Proiectele mele</h3>
+        <div class="projects-tabs">
+            <button class="tab-btn active" data-tab="created-projects">Proiecte create de mine</button>
+            <button class="tab-btn" data-tab="member-projects">Proiecte în care sunt membru</button>
+        </div>
+        
+        <div id="created-projects" class="tab-content active">
+            <div id="created-projects-list" class="projects-container">
+                <!-- Proiectele create de utilizator vor fi adăugate dinamic -->
+                <p id="no-created-projects-message" class="no-data-message">Nu aveți proiecte create.</p>
+            </div>
+        </div>
+        
+        <div id="member-projects" class="tab-content">
+            <div id="member-projects-list" class="projects-container">
+                <!-- Proiectele în care utilizatorul este membru vor fi adăugate dinamic -->
+                <p id="no-member-projects-message" class="no-data-message">Nu sunteți membru în niciun proiect.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistici utilizator -->
+    <div class="user-stats">
+        <h3>Statistici</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number" id="total-projects-count">0</span>
+                <span class="stat-label">Proiecte totale</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="created-projects-count">0</span>
+                <span class="stat-label">Proiecte create</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="member-projects-count">0</span>
+                <span class="stat-label">Proiecte ca membru</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="user-observations-count">0</span>
+                <span class="stat-label">Observații făcute</span>
+            </div>
+        </div>
+    </div>
+</section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ZooCollab. Toate drepturile rezervate.</p>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="notification-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="notification-message"></p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
